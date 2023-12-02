@@ -1,5 +1,6 @@
 import express from 'express';
 import { Logger } from '@pieropatron/tinylogger';
+import {ValidationError} from '@hapi/joi';
 
 import { dataSource } from './datasource';
 import { getTemplateRouter } from './routes/template';
@@ -22,6 +23,14 @@ const startApp = async () => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	app.use((error: Error, req, res, next) => {
 		if (error) {
+			if (error instanceof ValidationError){
+				return res.status(400).json({
+					error: 'Validation error',
+					details: error.details
+						.map(detail => detail.message)
+						.filter(message => !!message)
+				});
+			}
 			try {
 				logger.error(error);
 				res.status(500).json({ error: 'Internal server error' });

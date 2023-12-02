@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Index, Unique } from 'typeorm';
 import { Field } from './field';
 import { Document } from './document';
 
 @Entity()
+@Index(['name'], { unique: true })
 export class Template {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
