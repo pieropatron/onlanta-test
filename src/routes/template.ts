@@ -6,13 +6,13 @@ import { Field, FieldType } from '../entities/field';
 import { wrapHandler } from './_route_util';
 
 const templateSchema = Joi.object({
-	name: Joi.string(),
+	name: Joi.string().min(1),
 	attributeFields: Joi.array().items(
 		Joi.object({
 			name: Joi.string().min(1),
 			type: Joi.string().valid(...Object.keys(FieldType))
 		})
-	).unique().items(field => field.name)
+	).unique().items((field: Field) => field.name).min(1)
 });
 
 type templateBody = {

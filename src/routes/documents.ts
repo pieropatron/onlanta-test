@@ -1,9 +1,44 @@
 import express, { Request } from 'express';
 import { DataSource } from 'typeorm';
+import Joi from '@hapi/joi';
 import { Document } from '../entities/document';
 import { DocumentValue } from '../entities/document_values';
 import { Template } from '../entities/template';
 import { wrapHandler } from './_route_util';
+
+const documentSchema = Joi.object({
+	name: Joi.string().min(1),
+	template: Joi.object({
+		id: Joi.string().uuid().required(),
+		name: Joi.string().optional()
+	}).alter({
+		post: schema => schema.required(),
+		put: schema => schema.forbidden()
+	}),
+	attributeFields: Joi.array().items(
+		Joi.object({
+			name: Joi.string().min(1),
+			value: Joi.string().optional()
+		})
+	).unique().items((field: {name: string}) => field.name).min(1)
+});
+
+const documentSchemas = {
+	post: documentSchema.tailor('post'),
+	put: documentSchema.tailor('put')
+};
+
+type documentBody = {
+	name: string;
+	template: {
+		id: string;
+		name: string;
+	},
+	attributeFields: {
+		name: string,
+		value: string | number | undefined,
+	}[];
+}
 
 export function getDocumentRouter(dataSource: DataSource) {
 	const routerDocument = express.Router();
@@ -53,7 +88,7 @@ export function getDocumentRouter(dataSource: DataSource) {
 	}));
 
 	routerDocument.post('/', wrapHandler(async (req, res) => {
-		const body = req.body;
+		const body: documentBody = await documentSchemas.post.validateAsync(req.body);
 
 		const template = await templateRepo.findOne({
 			where: { id: body.template.id },
@@ -75,13 +110,11 @@ export function getDocumentRouter(dataSource: DataSource) {
 			if (!field) {
 				return res.status(404).json({ message: `${fieldName} not found` });
 			}
-			field.value = attributeFieldDoc.value;
+			field.value = attributeFieldDoc.value?.toString();
 		}
 
 		document.name = body.name;
 		document.template = template;
-
-		template.name = body.name;
 
 		const queryRunner = dataSource.createQueryRunner();
 		await queryRunner.startTransaction();
@@ -100,6 +133,7 @@ export function getDocumentRouter(dataSource: DataSource) {
 	}));
 
 	routerDocument.put('/:iddoc', wrapHandler(async (req: Request<{ iddoc: string }>, res) => {
+		const body: documentBody = await documentSchemas.put.validateAsync(req.body);
 		const iddoc = req.params.iddoc;
 		const document = await documentRepo.findOne({
 			where: { id: iddoc, isdeleted: false },
@@ -120,11 +154,9 @@ export function getDocumentRouter(dataSource: DataSource) {
 			return memo;
 		}, {} as Record<string, DocumentValue>);
 
-		const body = req.body;
-
 		body.attributeFields.forEach(field => {
 			const documentField = attributeFields[field.name];
-			documentField.value = field.value;
+			documentField.value = field.value?.toString();
 		});
 
 		const queryRunner = dataSource.createQueryRunner();
