@@ -4,7 +4,6 @@ import { Document } from '../entities/document';
 import { DocumentValue } from '../entities/document_values';
 import { Template } from '../entities/template';
 import { wrapHandler } from './_route_util';
-import { Field } from '../entities/field';
 
 export function getDocumentRouter(dataSource: DataSource) {
 	const routerDocument = express.Router();
