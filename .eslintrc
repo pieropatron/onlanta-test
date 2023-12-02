@@ -46,16 +46,6 @@
             }
         ],
         "vars-on-top": 1,
-        "max-len": [
-            1,
-            {
-				"ignoreStrings": true,
-				"ignoreTemplateLiterals": true,
-				"ignoreRegExpLiterals": true,
-                "code": 125,
-                "ignoreUrls": true
-            }
-        ],
 		"no-console": [
 			0
 		],

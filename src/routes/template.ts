@@ -35,10 +35,11 @@ export function getTemplateRouter(dataSource: DataSource) {
 			await queryRunner.manager.insert(Template, template);
 			await queryRunner.manager.insert(Field, attributeFields);
 			await queryRunner.commitTransaction();
+			queryRunner.release();
 		} catch (e){
 			await queryRunner.rollbackTransaction();
-		} finally {
 			queryRunner.release();
+			throw e;
 		}
 
 		res.status(201).json({message: 'template inserted'});

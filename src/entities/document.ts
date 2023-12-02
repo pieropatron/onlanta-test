@@ -15,4 +15,7 @@ export class Document {
 
 	@OneToMany(() => DocumentValue, value => value.document)
 	attributeFields: DocumentValue[];
+
+	@Column({default: false})
+	isdeleted: boolean;
 }

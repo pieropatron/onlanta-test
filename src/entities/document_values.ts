@@ -7,8 +7,8 @@ export class DocumentValue {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	@Column()
-	name: string;
+	@Column({nullable:true})
+	value?: string;
 
 	@ManyToOne(() => Document, template => template.attributeFields)
 	document: Document;

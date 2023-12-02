@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, Index } from 'typeorm';
 import { Template } from './template';
 import { DocumentValue } from './document_values';
 
@@ -9,6 +9,7 @@ export enum FieldType {
 }
 
 @Entity()
+@Index(['template', 'name'], {unique: true})
 export class Field {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

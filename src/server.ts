@@ -3,6 +3,7 @@ import { Logger } from '@pieropatron/tinylogger';
 
 import { dataSource } from './datasource';
 import { getTemplateRouter } from './routes/template';
+import { getDocumentRouter } from './routes/documents';
 
 const logger = new Logger('ONLANTA');
 logger.level = 'debug';
@@ -12,6 +13,7 @@ const startApp = async () => {
 	const app = express();
 	app.use(express.json());
 	app.use('/templates', getTemplateRouter(dataSource));
+	app.use('/documents', getDocumentRouter(dataSource));
 
 	app.listen(3000, 'localhost', () => {
 		logger.info(`server listen on port`, 3000);
