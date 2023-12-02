@@ -5,8 +5,9 @@ import {ValidationError} from '@hapi/joi';
 import { dataSource } from './datasource';
 import { getTemplateRouter } from './routes/template';
 import { getDocumentRouter } from './routes/documents';
+import 'dotenv/config';
 
-const logger = new Logger('ONLANTA');
+const logger = new Logger(process.env.APP_NAME || 'app');
 logger.level = 'debug';
 
 const startApp = async () => {
@@ -16,8 +17,10 @@ const startApp = async () => {
 	app.use('/templates', getTemplateRouter(dataSource));
 	app.use('/documents', getDocumentRouter(dataSource));
 
-	app.listen(3000, 'localhost', () => {
-		logger.info(`server listen on port`, 3000);
+	const APP_PORT = parseInt(process.env.APP_PORT || '') || 3000;
+
+	app.listen(APP_PORT, 'localhost', () => {
+		logger.info(`server listen on port`, APP_PORT);
 	});
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

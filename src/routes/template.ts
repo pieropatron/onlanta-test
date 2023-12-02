@@ -5,6 +5,8 @@ import { Template } from '../entities/template';
 import { Field, FieldType } from '../entities/field';
 import { wrapHandler } from './_route_util';
 
+type attributeField = Pick<Field, 'name' | 'type'>;
+
 const templateSchema = Joi.object({
 	name: Joi.string().min(1),
 	attributeFields: Joi.array().items(
@@ -12,15 +14,12 @@ const templateSchema = Joi.object({
 			name: Joi.string().min(1),
 			type: Joi.string().valid(...Object.keys(FieldType))
 		})
-	).unique().items((field: Field) => field.name).min(1)
+	).unique((field0: attributeField, field1: attributeField)=> field0.name === field1.name).items().min(1)
 });
 
 type templateBody = {
 	name: string;
-	attributeFields: {
-		name: string,
-		type: FieldType,
-	}[];
+	attributeFields: attributeField[];
 };
 
 export function getTemplateRouter(dataSource: DataSource) {

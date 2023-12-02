@@ -6,6 +6,11 @@ import { DocumentValue } from '../entities/document_values';
 import { Template } from '../entities/template';
 import { wrapHandler } from './_route_util';
 
+type attributeField = {
+	name: string,
+	value: string | number | undefined,
+};
+
 const documentSchema = Joi.object({
 	name: Joi.string().min(1),
 	template: Joi.object({
@@ -18,9 +23,9 @@ const documentSchema = Joi.object({
 	attributeFields: Joi.array().items(
 		Joi.object({
 			name: Joi.string().min(1),
-			value: Joi.string().optional()
+			value: Joi.alternatives().try(Joi.string(), Joi.number()).optional()
 		})
-	).unique().items((field: {name: string}) => field.name).min(1)
+	).unique((field0: attributeField, field1: attributeField) => field0.name === field1.name).items().min(1)
 });
 
 const documentSchemas = {
@@ -34,10 +39,7 @@ type documentBody = {
 		id: string;
 		name: string;
 	},
-	attributeFields: {
-		name: string,
-		value: string | number | undefined,
-	}[];
+	attributeFields: attributeField[];
 }
 
 export function getDocumentRouter(dataSource: DataSource) {
@@ -92,6 +94,9 @@ export function getDocumentRouter(dataSource: DataSource) {
 
 		const template = await templateRepo.findOne({
 			where: { id: body.template.id },
+			relations: {
+				attributeFields: true
+			}
 		});
 		if (!template) {
 			return res.status(404).json({ message: `Template not found` });

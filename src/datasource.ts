@@ -8,7 +8,7 @@ import 'dotenv/config';
 export const dataSource = new DataSource({
 	type: 'postgres',
 	url: process.env.PG_URL,
-	applicationName: 'ONLANTA',
+	applicationName: process.env.APP_NAME || '',
 	schema: 'Documents',
 	entities: [Template, Field, Document, DocumentValue],
 });

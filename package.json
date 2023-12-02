@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm:sync": "npx typeorm-ts-node-esm schema:sync -d src/datasource.ts",
-    "dev": "npx nodemon ./src/server.ts"
+    "start:dev": "npx nodemon ./src/server.ts",
+    "build": "tsc",
+    "start:prod": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
